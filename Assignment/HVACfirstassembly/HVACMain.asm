@@ -12,6 +12,7 @@
 //  	V1.0: 3/10/2025 - First version
 //	v1.1: Add Control Reg Usage
 //	V1.2: 3/12/2025 fixed issue where input sanitization considered certain numbers to be negative due to lower comparison value
+//	v1.3: 3/12/2025 fixed temperature comparisons to allow for appropriate heating and cooling
 //-----------------------------
 
 ; Useful links: 
@@ -29,8 +30,8 @@
 ;----------------
 ;Inouts are as Follows. input keypad temperature, or refTempInout, is user specified reference temperature. measuredTempInput is enviromental
 
-#define  measuredTempInput 	-10 ; this is the input value
-#define  refTempInput 		18 ; this is the input value
+#define  measuredTempInput 	-5 ; this is the input value
+#define  refTempInput 		15 ; this is the input value
 
 ;---------------------
 ; Definitions
@@ -86,9 +87,9 @@ _main:
     GOTO    _hvacON //if measured and reference are equal, skip turning on the hvac system
     call    _gold   //calls gold, which turns off HVAC, named after goldielocks for being "just right"
 _hvacON:
-    CPFSGT	0x21	//calls heating when too cold
+    CPFSLT	0x21	//calls heating when too cold
     call    _heating
-    CPFSLT	0x21	//calls heating when too hot
+    CPFSGT	0x21	//calls heating when too hot
     call    _cooling
     MOVFF       REG22,PORTD
     NOP
