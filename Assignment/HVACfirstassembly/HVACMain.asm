@@ -30,8 +30,8 @@
 ;----------------
 ;Inouts are as Follows. input keypad temperature, or refTempInout, is user specified reference temperature. measuredTempInput is enviromental
 
-#define  measuredTempInput 	-5 ; this is the input value
-#define  refTempInput 		15 ; this is the input value
+#define  measuredTempInput 	49; this is the input value
+#define  refTempInput 		49 ; this is the input value
 
 ;---------------------
 ; Definitions
@@ -85,13 +85,14 @@ _main:
     MOVFF	0x20,WREG   //calling reference temp to WREG for comparison with measured temp, for controlling heater logic
     CPFSEQ	0x21	    
     GOTO    _hvacON //if measured and reference are equal, skip turning on the hvac system
-    call    _gold   //calls gold, which turns off HVAC, named after goldielocks for being "just right"
+    GOTO    _gold   //calls gold, which turns off HVAC, named after goldielocks for being "just right"
 _hvacON:
     CPFSLT	0x21	//calls heating when too cold
     call    _heating
     CPFSGT	0x21	//calls heating when too hot
     call    _cooling
     MOVFF       REG22,PORTD
+_cycleoff:
     NOP
     sleep   //to beb relaced with loop in working enviroment
 
@@ -139,5 +140,5 @@ _heating:   //moves 0x02, or setting all low except for bit 1, to port d, settin
 _gold:	    //sets port d to zero, turning off HVAC
     MOVLW	0x00
     MOVWF       REG22,0
-    return
+    GOTO	_cycleoff	
 
