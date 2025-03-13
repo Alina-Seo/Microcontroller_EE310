@@ -13,6 +13,7 @@
 //	v1.1: Add Control Reg Usage
 //	V1.2: 3/12/2025 fixed issue where input sanitization considered certain numbers to be negative due to lower comparison value
 //	v1.3: 3/12/2025 fixed temperature comparisons to allow for appropriate heating and cooling
+//	v1.3.1: 3/13/2025 fixed gold program to allow for proper return if temp is equal
 //-----------------------------
 
 ; Useful links: 
