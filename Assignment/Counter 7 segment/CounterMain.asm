@@ -15,6 +15,7 @@
 ; Author: Alina Matchette, with loop segement and port innitialization written by Farid Farahmand
 ; Versions:
 ;       V1.0: Original
+;	V1.1: fixed bug where due to preincremenet table function pointer escaped normal memory range
 ; Useful links: 
 ;       Datasheet: https://ww1.microchip.com/downloads/en/DeviceDoc/PIC18(L)F26-27-45-46-47-55-56-57K42-Data-Sheet-40001919G.pdf 
 ;       PIC18F Instruction Sets: https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781119448457.app4 
@@ -91,10 +92,10 @@ db  0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0
 CountUp: ;code for coutning up
     TBLRD+* ;read from table and increment, before moving to output
     MOVFF   TABLAT,PORTD
-    MOVLW 0x8F ;value check, ensures table points does not wander higher than 0x89, the highest stored value
+    MOVLW 0x8E ;value check, ensures table points does not wander higher than 0x89, the highest stored value
     CPFSGT  TBLPTRL
     RETURN 
-    MOVLW 0x80
+    MOVLW 0x7f
     MOVWF   TBLPTRL
     RETURN
     
