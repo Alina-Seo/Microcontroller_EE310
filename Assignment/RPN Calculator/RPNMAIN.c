@@ -43,8 +43,8 @@ int takeOut(int s[],int c[]);
 
 
 
-signed int stack[4] = {256,1,0,0};
-int ctrl[5] = {0,0,2,1,0}; //control array, first digit is operator, second digit is digits place exponent, third is stack levels full, fourth is wether to display stack level or x reg
+signed int stack[4] = {0,0,0,0};
+int ctrl[5] = {0,0,0,0,0}; //control array, first digit is operator, second digit is digits place exponent, third is stack levels full, fourth is wether to display stack level or x reg
 /* C Controls
  * C[0] = Operator
  * C[1] = Digits Place
