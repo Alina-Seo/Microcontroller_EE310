@@ -13,7 +13,7 @@
  * Star - stack clear
  * Version - 1.0 original
  * Version - 1.1  - updated output function to return a value rather than set value in stack. this allows for original unfiltered output value to remain in the stack
- * Version - 1.2 - changes PORTB to PORTC
+ * Version - 1.2.1 - added while loop to improve inout taking
  * Created on April 7, 2025
  */
 
@@ -59,7 +59,7 @@ void main(void) {
     PORTC = 0; LATC = 0; ANSELC = 0; TRISC = 0b11110000; // port setup, ports C 4,5,6,7 as input rest of B and D as out
     PORTD = 0; LATD = 0; ANSELD = 0; TRISD = 0;
     
-    while (1){ //main loop
+    while (true){ //main loop
     
         takeIn(stack,ctrl); //takes input from the user
         __delay_ms(1);
@@ -136,7 +136,7 @@ void stackc(int s[], int c[]){ //clears stack and resets all values
     return;
 }
 void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code, taking input based on C and R values
-    
+    while (true){
     PORTCbits.RC3 = 0;
     PORTCbits.RC0 = 1;
     if (PORTCbits.RC4 ==1){
@@ -308,7 +308,7 @@ void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code
         c[0] = 4;
         return;
     }
-    
+}
     return;
 }
 int takeOut(int s[],int c[]){
