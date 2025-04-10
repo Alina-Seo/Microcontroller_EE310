@@ -12,6 +12,7 @@
  * Pound - stack push {ENTER}
  * Star - stack clear
  * Version - 1.0 original
+ * Version - 1.1  - updated output function to return a value rather than set value in stack. this allows for original unfiltered output value to remain in the stack
  * Created on April 7, 2025
  */
 
@@ -29,22 +30,28 @@
 
 
 // functions, with names that indecate function. stack in name reffers to stack array, while the rest are operators with an a at the end to denote they require an array in
-void adda(int array[]);
-void suba(int array[]);
-void mula(int array[]);
-void diva(int array[]);
-void stacku(int array[]);
-void stackd(int array[]);
-void stackc(int array[]);
+void adda(signed int s[], int c[]);
+void suba(signed int s[], int c[]);
+void mula(signed int s[], int c[]);
+void diva(signed int s[], int c[]);
+void stacku(signed int s[], int c[]);
+void stackd(signed int s[], int c[]);
+void stackc(signed int s[], int c[]);
 
 void takeIn(int s[], int c[]);
-void takeOut(int s[],int c[]);
+int takeOut(int s[],int c[]);
 
 
 
-signed int stack[4] = {0,0,0,0};
-int ctrl[4] = {0,0,0,0,0}; //control array, first digit is operator, second digit is digits place exponent, third is stack levels full, fourth is wether to display stack level or x reg
-
+signed int stack[4] = {256,1,0,0};
+int ctrl[5] = {0,0,2,1,0}; //control array, first digit is operator, second digit is digits place exponent, third is stack levels full, fourth is wether to display stack level or x reg
+/* C Controls
+ * C[0] = Operator
+ * C[1] = Digits Place
+ * C[2] = Full Stack Levels
+ * C[3] = Display Stack Levels (0) or Display Stack (1)
+ * C[4] = Unused
+ */
 
 
 void main(void) {
@@ -57,17 +64,17 @@ void main(void) {
         __delay_ms(1);
         
         switch (ctrl[0]){ //checks operators and preforms proper calculations
-            case 1: adda(stack); break;
-            case 2: suba(stack); break;
-            case 3: mula(stack); break;
-            case 4: diva(stack); break;
-            case 5: stacku(stack); ctrl[3]++;ctrl[1] = 0; break;
-            case 6: stackc(stack); break;
+            case 1: adda(stack,ctrl); break;
+            case 2: suba(stack,ctrl); break;
+            case 3: mula(stack,ctrl); break;
+            case 4: diva(stack,ctrl); break;
+            case 5: stacku(stack,ctrl); ctrl[3]++;ctrl[1] = 0; break;
+            case 6: stackc(stack,ctrl); break;
         }
         
         ctrl[0] = 0;
-        takeOut(stack,ctrl);
-        PORTD = stack[0];
+        
+        PORTD = takeOut(stack,ctrl);
         
         //display result
            __delay_ms(300);
@@ -80,46 +87,49 @@ void main(void) {
 
 
 
-void adda(int array[]){ //adding both x and y registers
-    array[1] += array[0];
-    stackd(array); //stack down
+void adda(int s[], int c[]){ //adding both x and y registers
+    s[1] += s[0];
+    stackd(s,c); //stack down
     return;
 }
-void suba(int array[]){ //subtracting both x and y registers
-    array[1] -= array[0];
-    stackd(array); //stack down
+void suba(int s[], int c[]){ //subtracting both x and y registers
+    s[1] -= s[0];
+    stackd(s,c); //stack down
     return;
 }
-void mula(int array[]){ //multiplying both x and y registers
-    array[1] *= array[0];
-    stackd(array); //stack down
+void mula(int s[], int c[]){ //multiplying both x and y registers
+    s[1] *= s[0];
+    stackd(s,c); //stack down
     return;
 }
-void diva(int array[]){ //diving both x and y registers
-    array[1] /= array[0];
-    stackd(array); //stack down
+void diva(int s[], int c[]){ //diving both x and y registers
+    s[1] /= s[0];
+    stackd(s,c); //stack down
     return;
 }
-void stacku(int array[]){ //pushes the stack up one level
+void stacku(int s[], int c[]){ //pushes the stack up one level
     
     for (int i= 2; i>=0; i--){   //using this for loop to iterrate through it and push values
-        array[i+1] = array[i];
+        s[i+1] = s[i];
     }
-    
+    c[2] ++;
+    c[3] = 0;
     return;
 }
-void stackd(int array[]){ // a similar method to pushing the stack up, but inverse
+void stackd(int s[], int c[]){ // a similar method to pushing the stack up, but inverse
 
     for (int i= 0; i<=3; i++){           
-        array[i-1] = array[i];
+        s[i-1] = s[i];
     }
-    array[3] = 0; // this is required as the top level of the stack needs to be set to zero as nothing is in it anymore
-    
+    s[3] = 0; // this is required as the top level of the stack needs to be set to zero as nothing is in it anymore
+    c[3] = 1;
+    c[2] --; 
     return;
 }
-void stackc(int array[]){ //clears stack and resets all values
+void stackc(int s[], int c[]){ //clears stack and resets all values
     for (int i = 0; i <=3; i++){
-        array[i] = 0;
+        s[i] = 0;
+        c[i] = 0;
     }
     
     return;
@@ -300,12 +310,11 @@ void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code
     
     return;
 }
-void takeOut(int s[],int c[]){
-    int tempOut = 0;
+int takeOut(int s[],int c[]){
+    int tempOut = s[1];
     switch (c[3]){
         case 0:
             tempOut =  c[2];
-            s[0] = tempOut; 
             break;
         case 1:
             tempOut = (s[0]>255)? 255 : s[0]; //checking if number is larger than max allowed and setting it
@@ -313,8 +322,8 @@ void takeOut(int s[],int c[]){
                 tempOut *= -1;
                 tempOut = 255 - tempOut;
             }
-            s[0] = tempOut; 
+             
             break;
     } 
-      
+   return tempOut; 
 }
