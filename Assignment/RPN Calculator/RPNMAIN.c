@@ -15,8 +15,10 @@
  * Version - 1.1  - updated output function to return a value rather than set value in stack. this allows for original unfiltered output value to remain in the stack
  * Version - 1.2.1 - added while loop to improve inout taking
  * version - 1.3 - fixed several errors that only recently appeared, including improper display, program resetting frequently, and issues with port C not outputting
+ * Version - 1.3.1 - changed default stack levels full to display a 1, considering that in RPN to properly display how many numbers you are entering it would display 1 as you are entering first number, ect, not after
  * Created on April 7, 2025
  */
+
 
 
 #include <xc.h>
@@ -61,7 +63,7 @@ void main(void) {
     PORTC = 0; LATC = 0; ANSELC = 0; TRISC = 0b11110000; // port setup, ports C 4,5,6,7 as input rest of B and D as out
     PORTD = 0; LATD = 0; ANSELD = 0; TRISD = 0;
 
-    
+    ctrl[2] = 1;
     while (1){ //main loop
          PORTD = takeOut(stack,ctrl);
         
@@ -137,7 +139,7 @@ void stackc(int s[], int c[]){ //clears stack and resets all values
         s[i] = 0;
         c[i] = 0;
     }
-    
+    c[2] = 1;
     return;
 }
 void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code, taking input based on C and R values
