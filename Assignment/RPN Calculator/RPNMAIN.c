@@ -14,6 +14,7 @@
  * Version - 1.0 original
  * Version - 1.1  - updated output function to return a value rather than set value in stack. this allows for original unfiltered output value to remain in the stack
  * Version - 1.2.1 - added while loop to improve inout taking
+ * version - 1.3 - fixed several errors that only recently appeared, including improper display, program resetting frequently, and issues with port C not outputting
  * Created on April 7, 2025
  */
 
@@ -23,7 +24,7 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 #include "C:/Program Files/Microchip/xc8/v3.00/pic/include/proc/pic18f47k42.h"
-
+#pragma config WDTE = OFF 
 
 #define _XTAL_FREQ 4000000                 // Fosc  frequency for _delay()  library
 #define FCY    _XTAL_FREQ/4
@@ -44,8 +45,8 @@ int takeOut(int s[],int c[]);
 
 
 
-signed int stack[4] = {0,0,0,0};
-int ctrl[5] = {0,0,0,0,0}; //control array, first digit is operator, second digit is digits place exponent, third is stack levels full, fourth is wether to display stack level or x reg
+signed int stack[4];
+int ctrl[5]; //control array, first digit is operator, second digit is digits place exponent, third is stack levels full, fourth is wether to display stack level or x reg
 /* C Controls
  * C[0] = Operator
  * C[1] = Digits Place
@@ -56,29 +57,32 @@ int ctrl[5] = {0,0,0,0,0}; //control array, first digit is operator, second digi
 
 
 void main(void) {
+    PORTB = 0; LATB = 0; ANSELB = 0; TRISB = 0;
     PORTC = 0; LATC = 0; ANSELC = 0; TRISC = 0b11110000; // port setup, ports C 4,5,6,7 as input rest of B and D as out
     PORTD = 0; LATD = 0; ANSELD = 0; TRISD = 0;
+
     
-    while (true){ //main loop
-    
+    while (1){ //main loop
+         PORTD = takeOut(stack,ctrl);
+        
         takeIn(stack,ctrl); //takes input from the user
-        __delay_ms(1);
+       
         
         switch (ctrl[0]){ //checks operators and preforms proper calculations
             case 1: adda(stack,ctrl); break;
             case 2: suba(stack,ctrl); break;
             case 3: mula(stack,ctrl); break;
             case 4: diva(stack,ctrl); break;
-            case 5: stacku(stack,ctrl); ctrl[3]++;ctrl[1] = 0; break;
+            case 5: stacku(stack,ctrl); break;
             case 6: stackc(stack,ctrl); break;
         }
         
         ctrl[0] = 0;
-        
-        PORTD = takeOut(stack,ctrl);
+          PORTD = takeOut(stack,ctrl);
+      
         
         //display result
-           __delay_ms(300);
+           __delay_ms(500);
     }
     
     
@@ -113,6 +117,7 @@ void stacku(int s[], int c[]){ //pushes the stack up one level
     for (int i= 2; i>=0; i--){   //using this for loop to iterrate through it and push values
         s[i+1] = s[i];
     }
+    c[1] = 0;
     c[2] ++;
     c[3] = 0;
     return;
@@ -137,8 +142,8 @@ void stackc(int s[], int c[]){ //clears stack and resets all values
 }
 void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code, taking input based on C and R values
     while (true){
-    PORTCbits.RC3 = 0;
-    PORTCbits.RC0 = 1;
+    PORTBbits.RB3 = 0;
+    PORTBbits.RB0 = 1;
     if (PORTCbits.RC4 ==1){
         switch(c[1]){
             case 0: 
@@ -185,8 +190,8 @@ void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code
         c[0] = 6;
         return;
     }
-    PORTCbits.RC0 = 0;
-    PORTCbits.RC1 = 1;
+    PORTBbits.RB0 = 0;
+    PORTBbits.RB1 = 1;
     if (PORTCbits.RC4 ==1){
         switch(c[1]){
             case 0: 
@@ -242,8 +247,8 @@ void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code
         }
         return;
     }
-    PORTCbits.RC1 = 0;
-    PORTCbits.RC2 = 1;
+    PORTBbits.RB1 = 0;
+    PORTBbits.RB2 = 1;
     if (PORTCbits.RC4 ==1){
         switch(c[1]){
             case 0: 
@@ -290,8 +295,8 @@ void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code
         c[0] = 5;
         return;
     }
-    PORTCbits.RC2 = 0;
-    PORTCbits.RC3 = 1;
+    PORTBbits.RB2 = 0;
+    PORTBbits.RB3 = 1;
     if (PORTCbits.RC4 ==1){
         c[0] = 1;
         return;
