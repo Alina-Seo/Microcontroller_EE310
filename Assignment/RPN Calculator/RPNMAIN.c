@@ -13,9 +13,10 @@
  * Star - stack clear
  * Version - 1.0 original
  * Version - 1.1  - updated output function to return a value rather than set value in stack. this allows for original unfiltered output value to remain in the stack
- * Version - 1.2.1 - added while loop to improve inout taking
+ * Version - 1.2.1 - added while loop to improve input taking
  * version - 1.3 - fixed several errors that only recently appeared, including improper display, program resetting frequently, and issues with port C not outputting
  * Version - 1.3.1 - changed default stack levels full to display a 1, considering that in RPN to properly display how many numbers you are entering it would display 1 as you are entering first number, ect, not after
+ * Version - 1.3.2 - changes stack to signed char, since output is always 1 byte wide
  * Created on April 7, 2025
  */
 
@@ -34,20 +35,20 @@
 
 
 // functions, with names that indecate function. stack in name reffers to stack array, while the rest are operators with an a at the end to denote they require an array in
-void adda(signed int s[], int c[]);
-void suba(signed int s[], int c[]);
-void mula(signed int s[], int c[]);
-void diva(signed int s[], int c[]);
-void stacku(signed int s[], int c[]);
-void stackd(signed int s[], int c[]);
-void stackc(signed int s[], int c[]);
+void adda(signed char s[], int c[]);
+void suba(signed char s[], int c[]);
+void mula(signed char s[], int c[]);
+void diva(signed char s[], int c[]);
+void stacku(signed char s[], int c[]);
+void stackd(signed char s[], int c[]);
+void stackc(signed char s[], int c[]);
 
-void takeIn(int s[], int c[]);
-int takeOut(int s[],int c[]);
+void takeIn(signed char s[], int c[]);
+int takeOut(signed char s[],int c[]);
 
 
 
-signed int stack[4];
+signed char stack[4];
 int ctrl[5]; //control array, first digit is operator, second digit is digits place exponent, third is stack levels full, fourth is wether to display stack level or x reg
 /* C Controls
  * C[0] = Operator
@@ -62,7 +63,7 @@ void main(void) {
     PORTB = 0; LATB = 0; ANSELB = 0; TRISB = 0;
     PORTC = 0; LATC = 0; ANSELC = 0; TRISC = 0b11110000; // port setup, ports C 4,5,6,7 as input rest of B and D as out
     PORTD = 0; LATD = 0; ANSELD = 0; TRISD = 0;
-
+    stack[0] = -1;
     ctrl[2] = 1;
     while (1){ //main loop
          PORTD = takeOut(stack,ctrl);
@@ -94,27 +95,27 @@ void main(void) {
 
 
 
-void adda(int s[], int c[]){ //adding both x and y registers
+void adda(signed char s[], int c[]){ //adding both x and y registers
     s[1] += s[0];
     stackd(s,c); //stack down
     return;
 }
-void suba(int s[], int c[]){ //subtracting both x and y registers
+void suba(signed char s[], int c[]){ //subtracting both x and y registers
     s[1] -= s[0];
     stackd(s,c); //stack down
     return;
 }
-void mula(int s[], int c[]){ //multiplying both x and y registers
+void mula(signed char s[], int c[]){ //multiplying both x and y registers
     s[1] *= s[0];
     stackd(s,c); //stack down
     return;
 }
-void diva(int s[], int c[]){ //diving both x and y registers
+void diva(signed char s[], int c[]){ //diving both x and y registers
     s[1] /= s[0];
     stackd(s,c); //stack down
     return;
 }
-void stacku(int s[], int c[]){ //pushes the stack up one level
+void stacku(signed char s[], int c[]){ //pushes the stack up one level
     
     for (int i= 2; i>=0; i--){   //using this for loop to iterrate through it and push values
         s[i+1] = s[i];
@@ -124,7 +125,7 @@ void stacku(int s[], int c[]){ //pushes the stack up one level
     c[3] = 0;
     return;
 }
-void stackd(int s[], int c[]){ // a similar method to pushing the stack up, but inverse
+void stackd(signed char s[], int c[]){ // a similar method to pushing the stack up, but inverse
 
     for (int i= 0; i<=3; i++){           
         s[i-1] = s[i];
@@ -134,7 +135,7 @@ void stackd(int s[], int c[]){ // a similar method to pushing the stack up, but 
     c[2] --; 
     return;
 }
-void stackc(int s[], int c[]){ //clears stack and resets all values
+void stackc(signed char s[], int c[]){ //clears stack and resets all values
     for (int i = 0; i <=3; i++){
         s[i] = 0;
         c[i] = 0;
@@ -142,7 +143,7 @@ void stackc(int s[], int c[]){ //clears stack and resets all values
     c[2] = 1;
     return;
 }
-void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code, taking input based on C and R values
+void takeIn(signed char s[], int c[]){ //loosely based on the keypad input assembly code, taking input based on C and R values
     while (true){
     PORTBbits.RB3 = 0;
     PORTBbits.RB0 = 1;
@@ -318,19 +319,14 @@ void takeIn(int s[], int c[]){ //loosely based on the keypad input assembly code
 }
     return;
 }
-int takeOut(int s[],int c[]){
+int takeOut(signed char s[],int c[]){
     int tempOut = s[1];
     switch (c[3]){
         case 0:
             tempOut =  c[2];
             break;
         case 1:
-            tempOut = (s[0]>255)? 255 : s[0]; //checking if number is larger than max allowed and setting it
-            if (tempOut < 0){ //checking if number is negative and then turning it into its 2s compliment
-                tempOut *= -1;
-                tempOut = 255 - tempOut;
-            }
-             
+            tempOut = s[0];
             break;
     } 
    return tempOut; 
