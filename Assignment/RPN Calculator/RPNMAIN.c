@@ -3,7 +3,7 @@
  * Author: Alina Matchette
  * Program for RPN calculator
  * Dependancies: xc.h, stdbool.h
- * 
+ * XC8 version 3.0
  * Operation: use keypad, 4x4 to enter numbers, 2 digits, into the calculator, RPN style. then press an operator key
  * A - add
  * B - subtract
