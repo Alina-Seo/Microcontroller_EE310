@@ -20,15 +20,30 @@
  */
 
 /* 
- * File:   
- * Author: 
- * Comments:
+ * File:   functions
+ * Author: Alina Matchette
+ * Comments: this file is used for the security main project it comes with on github, see main file securitymain for more details
  * Revision history: 
  * 1.0 - original
+ * 1.1 -added interrupt function
  */
 
 
 #include <xc.h>
+
+void __interrupt(irq(IRQ_INT0),base(0x4008)) INT0_ISR(void) //code for interrupt, triggers long beep when pressed
+{
+    if (PIR1bits.INT0IF == 1){
+        
+        PORTCbits.RC6  = 1;
+        __delay_ms(2000);
+        
+       PIR1bits.INT0IF =0; //reset interrupt
+       PORTCbits.RC6 = 0;     
+    }
+    
+}
+
 int sevenseg(int a); // changes numerical binary input to code that can be read to CC 7 segment LED display
 int sevenseg(int a){
    switch (a)
