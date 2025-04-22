@@ -73,7 +73,7 @@ while (1){
         }
     PORTD = sevenseg(usercode[0]); //outputs number in the reg to the display
 }
-    else if (PORTCbits.RC3 == 0){ //check second digit switch
+    else if (PORTCbits.RC3 == 1){ //check second digit switch
         usercode[1] += 1;
         if (usercode[1] > 4){
         usercode[1] = 0;
