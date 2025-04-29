@@ -14,15 +14,17 @@
  * 
  * Version
  *  1.0 Original
- * 
+ *  1.1 - updated math to log regression to better suit conditions of light indoors
  * Dependencies - none
  */
+
+
 
 
 #include "xc.h" // must have this
 #include "LCD.H"
 #include "init.h"
-
+#include <math.h>
 #include "C:/Program Files/Microchip/xc8/v3.00/pic/include/proc/pic18f47k42.h"
 
 #define _XTAL_FREQ 4000000                 // Fosc  frequency for _delay()  library
@@ -85,7 +87,7 @@ void main() {
         voltage = digital*((float)Vref/(float)(4096));
         
 
-        footCandel = -13.28889*(voltage)+37.11978;
+        footCandel = 33.48316-34.61015*log(voltage);
         sprintf(data,"%.2f",footCandel);
         strcat(data," ft candle ");	/*Concatenate result and unit to print*/
         LCD_write(0, "Light Level:");
