@@ -1,20 +1,23 @@
 /*
- * The purpose of this program is to demonstrate how a 20x2 LCD can be interfaced with a PIC processor. 
- * Refer to the lecture slides for more details on the physical connections.
- * You may want to consider changing this code, as needed, depending on your hardware. 
- * Author: Farid Farahmand 
+ * ADC light meter
+ * program for an ADC light meter measuring in foot candles
+ * 
+ * created by Alina Matchette with functions for LCD modified from code by Farid Farahmand
+ * Date: 4/28/2025
+ * 
+ * Inputs:
+ *  - photoresistor with 6.8kOhm resistor in voltage divider on port RA0
+ *  - interrupt pin RB0 button
+ * Outputs
+ *  - 16x2 HD44780 LCD, data pins on PORTD, RS,E pins on RB1,RB2
+ *  - LED on RB4 for interrupt
+ * 
+ * Version
+ *  1.0 Original
+ * 
+ * Dependencies - none
  */
 
-
-// PIC18F46K42 Configuration Bit Settings
-
-// 'C' source line config statements
-
-// CONFIG1L
-
-
-// CONFIG5L
-         // PFM and Data EEPROM Code Protection bit (PFM and Data EEPROM code protection disabled)
 
 #include "xc.h" // must have this
 #include "LCD.H"
